@@ -45,6 +45,13 @@ textarea:focus,input:focus{
   outline:none;border-color:var(--sky);background:#fff;
   box-shadow:0 0 0 4px var(--sky-soft);
 }
+.date{display:grid;grid-template-columns:1fr 1.6fr 1.2fr;gap:10px}
+select{
+  width:100%;font:inherit;color:var(--ink);background:var(--paper);
+  border:1.5px solid var(--line);border-radius:18px;padding:14px 14px;min-height:56px;
+  transition:border-color .2s, box-shadow .2s;
+}
+select:focus{outline:none;border-color:var(--sky);background:#fff;box-shadow:0 0 0 4px var(--sky-soft)}
 .group-title{
   margin:14px 4px -6px;font-size:15px;color:var(--ink-soft);
   display:flex;align-items:center;gap:12px;
@@ -86,8 +93,13 @@ button[disabled]{opacity:.6;cursor:wait}
     <div class="q"><label for="name">שם</label>
       <input id="name" name="שם" type="text" required autocomplete="name"></div>
 
-    <div class="q"><label for="bd">תאריך לידה</label>
-      <input id="bd" name="תאריך לידה" type="text" inputmode="numeric" placeholder="לדוגמה 14.3.1990"></div>
+    <div class="q"><span class="lbl" id="bd-l">תאריך לידה</span>
+      <div class="date" role="group" aria-labelledby="bd-l">
+        <select id="bd-d" aria-label="יום"><option value="">יום</option></select>
+        <select id="bd-m" aria-label="חודש"><option value="">חודש</option></select>
+        <select id="bd-y" aria-label="שנה"><option value="">שנה</option></select>
+      </div>
+      <input type="hidden" id="bd" name="תאריך לידה"></div>
 
     <div class="q"><label for="city">מקום מגורים</label>
       <input id="city" name="מקום מגורים" type="text"></div>
@@ -131,6 +143,19 @@ button[disabled]{opacity:.6;cursor:wait}
 <script>
 // הדביקי כאן את כתובת ה-Web App של Google Apps Script (ראי הוראות בקובץ השני)
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbzY9x6L1c47VN6QU2njzzjhFngrUpvmnqXa7KnM-3tEWcrYQMuzxNHm7dSpFO_IeiQG/exec";
+
+
+// תאריך לידה: בחירה מרשימות
+(function(){
+  const d=document.getElementById('bd-d'), m=document.getElementById('bd-m'), y=document.getElementById('bd-y'), h=document.getElementById('bd');
+  const months=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  for(let i=1;i<=31;i++) d.add(new Option(i,i));
+  months.forEach((n,i)=>m.add(new Option(n,i+1)));
+  const now=new Date().getFullYear();
+  for(let i=now-10;i>=1930;i--) y.add(new Option(i,i));
+  function sync(){ h.value=(d.value&&m.value&&y.value)? d.value+'.'+m.value+'.'+y.value : ''; }
+  [d,m,y].forEach(s=>s.addEventListener('change',sync));
+})();
 
 const f = document.getElementById('f');
 const err = document.getElementById('err');
